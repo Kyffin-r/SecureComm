@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureComm - PGP Encryption Toolkit</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/openpgp/4.0.1/openpgp.min.js" integrity="sha512-lExGOeNS95pcHQ7A8OyYt784z0PgWUM6aca060khfwM3oux+m1+DHIvcznUKsxr1lvow8EVjfLSUNVYtHsydSQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        :root {
+    --primary-color: #1a1a2e;
+    --secondary-color: #16213e;
+    --accent-color: #0f3460;
+    --background-color: #0e1228;
+    --text-color: #e9e9f0;
+    --card-bg: #252a41;
+    --hover-bg: rgba(45, 52, 89, 0.5);
+    --shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+    --border-radius: 15px;
+    --transition-speed: 0.4s;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-color) var(--secondary-color);
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, var(--background-color), var(--secondary-color));
+    color: var(--text-color);
+    line-height: 1.6;
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 280px;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    color: var(--text-color);
+    padding: 25px;
+    position: fixed;
+    height: 100%;
+    overflow-y: auto;
+    backdrop-filter: blur(10px);
+    box-shadow: -5px 0 20px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+}
+
+.sidebar h2 {
+    margin-bottom: 25px;
+    font-size: 1.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.sidebar a {
+    color: var(--text-color);
+    text-decoration: none;
+    display: block;
+    padding: 12px 15px;
+    border-radius: var(--border-radius);
+    transition: all var(--transition-speed);
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar a:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, var(--hover-bg), transparent);
+    transition: all var(--transition-speed);
+}
+
+.sidebar a:hover:before {
+    left: 100%;
+}
+
+.sidebar a:hover {
+    transform: translateX(10px);
+    background: var(--hover-bg);
+}
+
+/* Main Container */
+.container {
+    margin-left: 300px;
+    padding: 30px;
+    flex: 1;
+    perspective: 1000px;
+}
+
+/* Header */
+.app-header {
+    text-align: center;
+    padding: 40px 0;
+    background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+    color: var(--text-color);
+    border-radius: var(--border-radius);
+    margin-bottom: 25px;
+    box-shadow: var(--shadow);
+    transform: rotateX(10deg);
+    transition: transform var(--transition-speed);
+}
+
+.app-header:hover {
+    transform: rotateX(0);
+}
+
+/* Section Toggle */
+.section-toggle {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    margin: 20px 0;
+    box-shadow: var(--shadow);
+    transition: all var(--transition-speed) ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.section-toggle:hover {
+    transform: scale(1.03) translateY(-5px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.4);
+}
+
+.section-toggle h2 {
+    padding: 18px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.3rem;
+    font-weight: 600;
+    position: relative;
+}
+
+.section-toggle h2:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: linear-gradient(to right, var(--accent-color), var(--secondary-color));
+    transition: width var(--transition-speed);
+}
+
+.section-toggle:hover h2:after {
+    width: 100%;
+}
+
+.section-content {
+    display: none;
+    padding: 25px;
+    background-color: var(--card-bg);
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+}
+
+/* Inputs and Forms */
+.input-group {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--text-color);
+}
+
+input, textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid var(--accent-color);
+    border-radius: 10px;
+    background-color: rgba(45, 52, 89, 0.3);
+    color: var(--text-color);
+    transition: all var(--transition-speed);
+    resize: vertical;
+    min-height: 120px;
+    max-height: 350px;
+    font-size: 0.95rem;
+}
+
+input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 15px rgba(22, 33, 62, 0.5);
+}
+
+/* Buttons */
+.btn {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+    color: var(--text-color);
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all var(--transition-speed);
+    margin-top: 20px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: all var(--transition-speed);
+}
+
+.btn:hover:before {
+    left: 100%;
+}
+
+.btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .sidebar, .container {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .sidebar {
+        position: relative;
+        height: auto;
+    }
+
+    .container {
+        padding: 15px;
+    }
+}
+.page-footer {
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            color: var(--text-color);
+            padding: 30px 0;
+            margin-top: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .footer-section {
+            flex: 1;
+            margin: 10px 20px;
+            min-width: 200px;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .footer-section p, .footer-section a {
+            color: var(--text-color);
+            text-decoration: none;
+            transition: color var(--transition-speed);
+        }
+
+        .footer-section a:hover {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .social-icons a {
+            font-size: 1.5rem;
+            opacity: 0.7;
+            transition: opacity var(--transition-speed);
+        }
+
+        .social-icons a:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Navigation</h2>
+        <a href="#" onclick="toggleSection('generate-keys')">Generate PGP Keys</a>
+        <a href="#" onclick="toggleSection('encrypt')">Encrypt Message</a>
+        <a href="#" onclick="toggleSection('decrypt')">Decrypt Message</a>
+        <a href="#" onclick="toggleSection('how-to')">How To Use</a>
+        <a href="#" onclick="toggleSection('about')">About</a>
+        <a href="#" onclick="toggleSection('history')">History of PGP</a>
+    </div>
+
+    <div class="container">
+        <header class="app-header">
+            <h1>SecureComm PGP Toolkit</h1>
+            <p>Secure Communication Made Simple</p>
+        </header>
+
+        <div class="section-toggle" onclick="toggleSection('generate-keys')">
+            <h2>Generate PGP Keys 🔑</h2>
+        </div>
+        <div id="generate-keys" class="section-content">
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" id="name" placeholder="Enter your full name">
+            </div>
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="email" placeholder="Enter your email">
+            </div>
+            <div class="input-group">
+                <label>Passphrase</label>
+                <input type="password" id="passphrase" placeholder="Create a strong passphrase">
+            </div>
+            <button class="btn" onclick="generateKeys()">Generate Keys</button>
+            
+            <div class="result-area">
+                <h3>Private Key</h3>
+                <textarea id="privateKey" readonly placeholder="Your private key will appear here"></textarea>
+                <button class="copy-btn" onclick="copyToClipboard('privateKey')">
+                    📋
+                    <span class="tooltip">Copy</span>
+                </button>
+            </div>
+            <div class="result-area">
+                <h3>Public Key</h3>
+                <textarea id="publicKey" readonly placeholder="Your public key will appear here"></textarea>
+                <button class="copy-btn" onclick="copyToClipboard('publicKey')">
+                    📋
+                    <span class="tooltip">Copy</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="section-toggle" onclick="toggleSection('encrypt')">
+            <h2>Encrypt Message 🔒</h2>
+        </div>
+        <div id="encrypt" class="section-content">
+            <div class="input-group">
+                <label>Recipient's Public Key</label>
+                <textarea id="publicKeyEncrypt" placeholder="Paste recipient's public key"></textarea>
+            </div>
+            <div class="input-group">
+                <label>Message to Encrypt</label>
+                <textarea id="plainText" placeholder="Enter your secret message"></textarea>
+            </div>
+            <button class="btn" onclick="encryptMessage()">Encrypt</button>
+            <div class="result-area">
+                <h3>Encrypted Message</h3>
+                <textarea id="cipherText" readonly placeholder="Encrypted message will appear here"></textarea>
+                <button class="copy-btn" onclick="copyToClipboard('cipherText')">
+                    📋
+                    <span class="tooltip">Copy</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="section-toggle" onclick="toggleSection('decrypt')">
+            <h2>Decrypt Message 🔓</h2>
+        </div>
+        <div id="decrypt" class="section-content">
+            <div class="input-group">
+                <label>Your Private Key</label>
+                <textarea id="privateKeyDecrypt" placeholder="Paste your private key"></textarea>
+            </div>
+            <div class="input-group">
+                <label>Passphrase</label>
+                <input type="password" id="passphraseDecrypt" placeholder="Enter your passphrase">
+            </div>
+            <div class="input-group">
+                <label>Encrypted Message</label>
+                <textarea id="cipherTextDecrypt" placeholder="Paste encrypted message"></textarea>
+            </div>
+            <button class="btn" onclick="decryptMessage()">Decrypt</button>
+            <div class="result-area">
+                <h3>Decrypted Message</h3>
+                <textarea id="plainTextDecrypt" readonly placeholder="Decrypted message will appear here"></textarea>
+                <button class="copy-btn" onclick="copyToClipboard('plainTextDecrypt')">
+                    📋
+                    <span class="tooltip">Copy</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="how-to" class="how-to section-content">
+            <h2>How To Use SecureComm</h2>
+            <p><strong>1. Generate PGP Keys:</strong> Fill in your name, email, and a strong passphrase to generate your PGP keys.</p>
+            <p><strong>2. Encrypt a Message:</strong> Paste the recipient's public key and your message, then click "Encrypt" to secure your message.</p>
+            <p><strong>3. Decrypt a Message:</strong> Paste your private key, enter your passphrase, and the encrypted message to retrieve the original message.</p>
+            <p>Enjoy secure communication!</p>
+        </div>
+
+        <div id="about" class="about section-content">
+            <h2>About SecureComm</h2>
+            <p>SecureComm is a user-friendly toolkit designed to simplify the process of secure communication using PGP (Pretty Good Privacy) encryption. Our goal is to make encryption accessible to everyone, ensuring that your messages remain private and secure.</p>
+        </div>
+
+        <div id="history" class="history section-content">
+            <h2>History of PGP</h2>
+            <p>PGP was created by Phil Zimmermann in 1991 as a way to provide privacy and authentication for email communication. It uses a combination of symmetric-key cryptography and public-key cryptography to secure messages. Over the years, PGP has evolved and is now widely used for secure communication across various platforms.</p>
+            <p>PGP has played a significant role in the development of modern encryption standards and continues to be a vital tool for privacy advocates and security-conscious individuals.</p>
+        </div>
+        <div class="page-footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>About SecureComm</h3>
+                    <p>Secure communication through user-friendly PGP encryption made by Kyffin-r</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <p><a href="#generate-keys">Generate Keys</a></p>
+                    <p><a href="#encrypt">Encrypt Message</a></p>
+                    <p><a href="#decrypt">Decrypt Message</a></p>
+                </div>
+                <div class="footer-section">
+                    <h3>Resources</h3>
+                    <p><a href="#how-to">How to Use</a></p>
+                    <p><a href="#history">PGP History</a></p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 SecureComm. All Rights Reserved.</p>
+                <div class="social-icons">
+                    <a href="#">🌐</a>
+                    <a href="#">🔒</a>
+                    <a href="#">📧</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSection(sectionId) {
+            const sections = document.querySelectorAll('.section-content');
+            sections.forEach(section => {
+                if (section.id === sectionId) {
+                    section.style.display = section.style.display === 'block' ? 'none' : 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        }
+
+        function copyToClipboard(elementId) {
+            const copyText = document.getElementById(elementId);
+            const tooltip = copyText.nextElementSibling.querySelector('.tooltip');
+            
+            copyText.select();
+            document.execCommand('copy');
+            
+            tooltip.style.opacity = '1';
+            setTimeout(() => {
+                tooltip.style.opacity = '0';
+            }, 1500);
+        }
+
+        async function generateKeys() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const passphrase = document.getElementById('passphrase').value;
+
+            if (!name || !email || !passphrase) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            try {
+                const { privateKeyArmored, publicKeyArmored } = await openpgp.generateKey({
+                    userIds: [{ name, email }],
+                    passphrase
+                });
+
+                document.getElementById('privateKey').value = privateKeyArmored;
+                document.getElementById('publicKey').value = publicKeyArmored;
+            } catch (error) {
+                console.error('Key generation error:', error);
+                alert('Failed to generate keys');
+            }
+        }
+
+        async function encryptMessage() {
+            const publicKey = document.getElementById('publicKeyEncrypt').value;
+            const plainText = document.getElementById('plainText').value;
+
+            try {
+                const publicKeyObject = await openpgp.readKey({ armoredKey: publicKey });
+                const encrypted = await openpgp.encrypt({
+                    message: await openpgp.createMessage({ text: plainText }),
+                    encryptionKeys: publicKeyObject
+                });
+
+                document.getElementById('cipherText').value = encrypted;
+            } catch (error) {
+                console.error('Encryption error:', error);
+                alert('Failed to encrypt message');
+            }
+        }
+
+        async function decryptMessage() {
+            const privateKey = document.getElementById('privateKeyDecrypt').value;
+            const passphrase = document.getElementById('passphraseDecrypt').value;
+            const cipherText = document.getElementById('cipherTextDecrypt').value;
+
+            try {
+                const privateKeyObject = await openpgp.readPrivateKey({ armoredKey: privateKey });
+                const decryptedKey = await openpgp.decryptKey({
+                    privateKey: privateKeyObject,
+                    passphrase
+                });
+
+                const message = await openpgp.readMessage({ armoredMessage: cipherText });
+                const { data } = await openpgp.decrypt({
+                    message,
+                    decryptionKeys: decryptedKey
+                });
+
+                document.getElementById('plainTextDecrypt').value = data;
+            } catch (error) {
+                console.error('Decryption error:', error);
+                alert('Failed to decrypt message');
+            }
+        }
+    </script>
+</body>
+</html>
