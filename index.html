@@ -430,93 +430,86 @@
             }
         }
 
-        // PGP Functions
         async function generateKeys() {
-            const name = document.getElementById('name').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const passphrase = document.getElementById('passphrase').value;
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const passphrase = document.getElementById('passphrase').value;
 
-            if (!name || !email || !passphrase) {
-                showAlert('Please fill in all fields', 'error');
-                return;
-            }
+    if (!name || !email || !passphrase) {
+        showAlert('Please fill in all fields', 'error');
+        return;
+    }
 
-            try {
-                showAlert('Generating keys...');
-                const { privateKey, publicKey } = await openpgp.generateKey({
-                    type: 'rsa',
-                    rsaBits: 4096,
-                    userIDs: [{ name, email }],
-                    passphrase
-                });
+    try {
+        showAlert('Generating keys...');
+        
+        const { privateKeyArmored, publicKeyArmored } = await openpgp.generateKey({
+            userIds: [{ name, email }], // Changed from userIDs to userIds
+            rsaBits: 4096,
+            passphrase
+        });
 
-                document.getElementById('privateKey').value = privateKey;
-                document.getElementById('publicKey').value = publicKey;
-                showAlert('Keys generated successfully!');
-            } catch (error) {
-                console.error('Key generation error:', error);
-                showAlert('Failed to generate keys: ' + error.message, 'error');
-            }
-        }
+        document.getElementById('privateKey').value = privateKeyArmored;
+        document.getElementById('publicKey').value = publicKeyArmored;
+        showAlert('Keys generated successfully!');
+    } catch (error) {
+        console.error('Key generation error:', error);
+        showAlert('Failed to generate keys: ' + error.message, 'error');
+    }
+}
 
-        async function encryptMessage() {
-            const publicKeyArmored = document.getElementById('publicKeyEncrypt').value.trim();
-            const plainText = document.getElementById('plainText').value.trim();
+async function encryptMessage() {
+    const publicKeyArmored = document.getElementById('publicKeyEncrypt').value.trim();
+    const plainText = document.getElementById('plainText').value.trim();
 
-            if (!publicKeyArmored || !plainText) {
-                showAlert('Please provide both public key and message', 'error');
-                return;
-            }
+    if (!publicKeyArmored || !plainText) {
+        showAlert('Please provide both public key and message', 'error');
+        return;
+    }
 
-            try {
-                const publicKey = await openpgp.readKey({ armoredKey: publicKeyArmored });
-                const message = await openpgp.createMessage({ text: plainText });
-                const encrypted = await openpgp.encrypt({
-                    message,
-                    encryptionKeys: publicKey
-                });
+    try {
+        const publicKey = await openpgp.key.readArmored(publicKeyArmored); // Changed from readKey
+        const message = openpgp.message.fromText(plainText); // Changed from createMessage
+        const encrypted = await openpgp.encrypt({
+            message,
+            publicKeys: publicKey.keys // Changed from encryptionKeys
+        });
 
-                document.getElementById('cipherText').value = encrypted;
-                showAlert('Message encrypted successfully!');
-            } catch (error) {
-                console.error('Encryption error:', error);
-                showAlert('Failed to encrypt message: ' + error.message, 'error');
-            }
-        }
+        document.getElementById('cipherText').value = encrypted;
+        showAlert('Message encrypted successfully!');
+    } catch (error) {
+        console.error('Encryption error:', error);
+        showAlert('Failed to encrypt message: ' + error.message, 'error');
+    }
+}
 
-        async function decryptMessage() {
-            const privateKeyArmored = document.getElementById('privateKeyDecrypt').value.trim();
-            const passphrase = document.getElementById('passphraseDecrypt').value;
-            const encryptedMessage = document.getElementById('cipherTextDecrypt').value.trim();
+async function decryptMessage() {
+    const privateKeyArmored = document.getElementById('privateKeyDecrypt').value.trim();
+    const passphrase = document.getElementById('passphraseDecrypt').value;
+    const encryptedMessage = document.getElementById('cipherTextDecrypt').value.trim();
 
-            if (!privateKeyArmored || !passphrase || !encryptedMessage) {
-                showAlert('Please provide private key, passphrase, and encrypted message', 'error');
-                return;
-            }
+    if (!privateKeyArmored || !passphrase || !encryptedMessage) {
+        showAlert('Please provide private key, passphrase, and encrypted message', 'error');
+        return;
+    }
 
-            try {
-                const privateKey = await openpgp.readPrivateKey({ armoredKey: privateKeyArmored });
-                const decryptedPrivateKey = await openpgp.decryptKey({
-                    privateKey,
-                    passphrase
-                });
+    try {
+        const privateKey = (await openpgp.key.readArmored(privateKeyArmored)).keys[0]; // Changed from readPrivateKey
+        await privateKey.decrypt(passphrase); // Changed from decryptKey
 
-                const message = await openpgp.readMessage({
-                    armoredMessage: encryptedMessage
-                });
+        const message = await openpgp.message.readArmored(encryptedMessage); // Changed from readMessage
+        const decrypted = await openpgp.decrypt({
+            message,
+            privateKeys: [privateKey] // Changed from decryptionKeys
+        });
 
-                const { data: decrypted } = await openpgp.decrypt({
-                    message,
-                    decryptionKeys: decryptedPrivateKey
-                });
-
-                document.getElementById('plainTextDecrypt').value = decrypted;
-                showAlert('Message decrypted successfully!');
-            } catch (error) {
-                console.error('Decryption error:', error);
-                showAlert('Failed to decrypt message: ' + error.message, 'error');
-            }
-        }
+        document.getElementById('plainTextDecrypt').value = decrypted.data;
+        showAlert('Message decrypted successfully!');
+    } catch (error) {
+        console.error('Decryption error:', error);
+        showAlert('Failed to decrypt message: ' + error.message, 'error');
+    }
+}
 
         // Clear sensitive data when leaving the page
         window.addEventListener('beforeunload', () => {
