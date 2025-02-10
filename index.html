@@ -3,184 +3,252 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OnlinePGP</title>
-    <link rel="shortcut icon" href="favicon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/openpgp/4.0.1/openpgp.min.js" crossorigin="anonymous"></script>
+    <title>OnlinePGP - PGP Encryption Toolkit</title>
+    <link rel="shortcut icon" type="png" href="favicon.png"/>
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background: #121212;
-            color: #e0e0e0;
-            margin: 0;
-            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: #0e1228;
+            color: #e9e9f0;
             display: flex;
-            height: 100vh;
+            min-height: 100vh;
         }
         .sidebar {
-            background: #1c1c1c;
-            padding: 1rem;
-            width: 250px;
+            background: #1a1a2e;
+            color: #fff;
+            padding: 20px;
+            width: 200px;
             height: 100vh;
-            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar h2 {
+            margin-bottom: 20px;
         }
         .sidebar button {
-            display: block;
             background: none;
+            color: #e9e9f0;
             border: none;
-            color: #e0e0e0;
-            padding: 10px 0;
+            padding: 10px;
+            margin: 5px 0;
             text-align: left;
-            width: 100%;
             cursor: pointer;
         }
         .sidebar button:hover {
-            background: #333;
+            background: #16213e;
         }
-        .content {
-            flex: 1;
-            padding: 2rem;
-            overflow-y: auto;
+        .container {
+            flex-grow: 1;
+            padding: 20px;
         }
-        section {
+        .section {
             display: none;
         }
-        section.active {
+        .section.active {
             display: block;
         }
-        textarea, input {
-            width: 100%;
-            margin-bottom: 1rem;
-            padding: 0.5rem;
-            background: #2c2c2c;
-            border: 1px solid #3c3c3c;
-            color: #e0e0e0;
-            border-radius: 4px;
+        h1, h2 {
+            text-align: center;
         }
-        .btn {
-            background: #1e88e5;
+        .input-group {
+            margin-bottom: 15px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            background: #252a41;
+            border: none;
+            border-radius: 8px;
+            color: #e9e9f0;
+            font-size: 1rem;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #0f3460;
             color: #fff;
             border: none;
-            padding: 0.5rem 1rem;
+            border-radius: 8px;
             cursor: pointer;
-            border-radius: 4px;
+            font-size: 1rem;
         }
-        .btn:hover {
-            background: #1565c0;
+        button:hover {
+            background: #16213e;
+        }
+        .result-area {
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
     <div class="sidebar">
-        <button data-section="generate-keys">Generate Keys</button>
-        <button data-section="encrypt">Encrypt</button>
-        <button data-section="decrypt">Decrypt</button>
-        <button data-section="about">About</button>
+        <h2>Navigation</h2>
+        <button class="nav-link" data-section="generate-keys">Generate PGP Keys</button>
+        <button class="nav-link" data-section="encrypt">Encrypt Message</button>
+        <button class="nav-link" data-section="decrypt">Decrypt Message</button>
     </div>
-    <div class="content">
-        <section id="generate-keys" class="active">
-            <h2>Generate Keys</h2>
-            <input type="text" id="name" placeholder="Name">
-            <input type="email" id="email" placeholder="Email">
-            <input type="password" id="passphrase" placeholder="Passphrase">
-            <button class="btn" onclick="generateKeys()">Generate</button>
-            <textarea id="privateKey" placeholder="Private Key" readonly></textarea>
-            <textarea id="publicKey" placeholder="Public Key" readonly></textarea>
+
+    <div class="container">
+        <header>
+            <h1>OnlinePGP PGP Toolkit</h1>
+        </header>
+
+        <section id="generate-keys" class="section">
+            <h2>Generate PGP Keys</h2>
+            <div class="input-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" placeholder="Enter your full name">
+            </div>
+            <div class="input-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="Enter your email">
+            </div>
+            <div class="input-group">
+                <label for="passphrase">Passphrase</label>
+                <input type="password" id="passphrase" placeholder="Create a strong passphrase">
+            </div>
+            <button onclick="generateKeys()">Generate Keys</button>
+            <div class="result-area">
+                <h3>Private Key</h3>
+                <textarea id="privateKey" readonly></textarea>
+            </div>
+            <div class="result-area">
+                <h3>Public Key</h3>
+                <textarea id="publicKey" readonly></textarea>
+            </div>
         </section>
-        <section id="encrypt">
+
+        <section id="encrypt" class="section">
             <h2>Encrypt Message</h2>
-            <textarea id="publicKeyEncrypt" placeholder="Recipient's Public Key"></textarea>
-            <textarea id="plainText" placeholder="Message"></textarea>
-            <button class="btn" onclick="encryptMessage()">Encrypt</button>
-            <textarea id="cipherText" placeholder="Encrypted Message" readonly></textarea>
+            <div class="input-group">
+                <label for="publicKeyEncrypt">Recipient's Public Key</label>
+                <textarea id="publicKeyEncrypt"></textarea>
+            </div>
+            <div class="input-group">
+                <label for="plainText">Message to Encrypt</label>
+                <textarea id="plainText"></textarea>
+            </div>
+            <button onclick="encryptMessage()">Encrypt Message</button>
+            <div class="result-area">
+                <h3>Encrypted Message</h3>
+                <textarea id="cipherText" readonly></textarea>
+            </div>
         </section>
-        <section id="decrypt">
+
+        <section id="decrypt" class="section">
             <h2>Decrypt Message</h2>
-            <textarea id="privateKeyDecrypt" placeholder="Your Private Key"></textarea>
-            <input type="password" id="passphraseDecrypt" placeholder="Passphrase">
-            <textarea id="cipherTextDecrypt" placeholder="Encrypted Message"></textarea>
-            <button class="btn" onclick="decryptMessage()">Decrypt</button>
-            <textarea id="plainTextDecrypt" placeholder="Decrypted Message" readonly></textarea>
-        </section>
-        <section id="about">
-            <h2>About OnlinePGP</h2>
-            <p>OnlinePGP is a simple and secure tool for generating PGP keys, encrypting messages, and decrypting encrypted content. Powered by OpenPGP.js, this app ensures secure communication by following modern cryptographic standards.</p>
-            <p><strong>How to use:</strong></p>
-            <ul>
-                <li>Generate your public and private keys in the "Generate Keys" section.</li>
-                <li>Use the "Encrypt" section to secure a message with the recipient's public key.</li>
-                <li>Decrypt messages in the "Decrypt" section using your private key and passphrase.</li>
-            </ul>
+            <div class="input-group">
+                <label for="privateKeyDecrypt">Your Private Key</label>
+                <textarea id="privateKeyDecrypt"></textarea>
+            </div>
+            <div class="input-group">
+                <label for="passphraseDecrypt">Passphrase</label>
+                <input type="password" id="passphraseDecrypt" placeholder="Enter your passphrase">
+            </div>
+            <div class="input-group">
+                <label for="cipherTextDecrypt">Encrypted Message</label>
+                <textarea id="cipherTextDecrypt"></textarea>
+            </div>
+            <button onclick="decryptMessage()">Decrypt Message</button>
+            <div class="result-area">
+                <h3>Decrypted Message</h3>
+                <textarea id="plainTextDecrypt" readonly></textarea>
+            </div>
         </section>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/openpgp/4.0.1/openpgp.min.js"></script>
     <script>
-        document.querySelectorAll('.sidebar button').forEach(button => {
-            button.addEventListener('click', () => {
-                document.querySelectorAll('section').forEach(section => section.classList.remove('active'));
-                document.getElementById(button.dataset.section).classList.add('active');
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const sectionId = e.target.dataset.section;
+                showSection(sectionId);
             });
         });
 
-        async function generateKeys() {
-            try {
-                const name = document.getElementById('name').value;
-                const email = document.getElementById('email').value;
-                const passphrase = document.getElementById('passphrase').value;
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+        }
 
-                const { privateKey, publicKey } = await openpgp.generateKey({
-                    type: 'ecc',
-                    curve: 'curve25519',
-                    userIDs: [{ name, email }],
-                    passphrase,
+        showSection('generate-keys');
+
+        async function generateKeys() {
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const passphrase = document.getElementById('passphrase').value;
+
+            if (!name || !email || !passphrase) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            try {
+                const { privateKeyArmored, publicKeyArmored } = await openpgp.generateKey({
+                    userIds: [{ name, email }],
+                    rsaBits: 4096,
+                    passphrase
                 });
 
-                document.getElementById('privateKey').value = privateKey;
-                document.getElementById('publicKey').value = publicKey;
+                document.getElementById('privateKey').value = privateKeyArmored;
+                document.getElementById('publicKey').value = publicKeyArmored;
                 alert('Keys generated successfully!');
             } catch (error) {
-                alert('Failed to generate keys: ' + error.message);
+                console.error('Key generation error:', error);
+                alert('Failed to generate keys');
             }
         }
 
         async function encryptMessage() {
-            try {
-                const publicKeyArmored = document.getElementById('publicKeyEncrypt').value;
-                const message = document.getElementById('plainText').value;
+            const publicKeyArmored = document.getElementById('publicKeyEncrypt').value.trim();
+            const plainText = document.getElementById('plainText').value.trim();
 
-                const publicKey = await openpgp.readKey({ armoredKey: publicKeyArmored });
+            if (!publicKeyArmored || !plainText) {
+                alert('Please provide both public key and message');
+                return;
+            }
+
+            try {
+                const publicKey = await openpgp.key.readArmored(publicKeyArmored);
+                const message = openpgp.message.fromText(plainText);
                 const encrypted = await openpgp.encrypt({
-                    message: await openpgp.createMessage({ text: message }),
-                    encryptionKeys: publicKey,
+                    message,
+                    publicKeys: publicKey.keys
                 });
 
                 document.getElementById('cipherText').value = encrypted;
                 alert('Message encrypted successfully!');
             } catch (error) {
-                alert('Failed to encrypt message: ' + error.message);
+                console.error('Encryption error:', error);
+                alert('Failed to encrypt message');
             }
         }
 
         async function decryptMessage() {
+            const privateKeyArmored = document.getElementById('privateKeyDecrypt').value.trim();
+            const passphrase = document.getElementById('passphraseDecrypt').value;
+            const encryptedMessage = document.getElementById('cipherTextDecrypt').value.trim();
+
+            if (!privateKeyArmored || !passphrase || !encryptedMessage) {
+                alert('Please provide private key, passphrase, and encrypted message');
+                return;
+            }
+
             try {
-                const privateKeyArmored = document.getElementById('privateKeyDecrypt').value;
-                const passphrase = document.getElementById('passphraseDecrypt').value;
-                const encryptedMessage = document.getElementById('cipherTextDecrypt').value;
+                const privateKey = (await openpgp.key.readArmored(privateKeyArmored)).keys[0];
+                await privateKey.decrypt(passphrase);
 
-                const privateKey = await openpgp.decryptKey({
-                    privateKey: await openpgp.readPrivateKey({ armoredKey: privateKeyArmored }),
-                    passphrase,
-                });
-                const message = await openpgp.readMessage({ armoredMessage: encryptedMessage });
-
-                const { data: decrypted } = await openpgp.decrypt({
+                const message = await openpgp.message.readArmored(encryptedMessage);
+                const decrypted = await openpgp.decrypt({
                     message,
-                    decryptionKeys: privateKey,
+                    privateKeys: [privateKey]
                 });
 
-                document.getElementById('plainTextDecrypt').value = decrypted;
+                document.getElementById('plainTextDecrypt').value = decrypted.data;
                 alert('Message decrypted successfully!');
             } catch (error) {
-                alert('Failed to decrypt message: ' + error.message);
+                console.error('Decryption error:', error);
+                alert('Failed to decrypt message');
             }
         }
     </script>
