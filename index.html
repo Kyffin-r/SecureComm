@@ -6,10 +6,12 @@
     <title>OnlinePGP - PGP Encryption Toolkit</title>
     <link rel="shortcut icon" type="png" href="favicon.png"/>
     
+    <!-- Meta Tags -->
     <meta name="description" content="OnlinePGP is a user-friendly toolkit designed to simplify secure communication with PGP encryption, offering tools for encryption, decryption, and key management.">
     <meta name="keywords" content="PGP tool, encrypt, decrypt, secure communication, PGP encryption, online security, OnlinePGP, online pgp, securecomm, pgp online, privacy">
     <meta name="author" content="Kyffin-r">
 
+    <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="OnlinePGP - PGP Encryption Toolkit">
     <meta property="og:description" content="Simplify secure communication with OnlinePGP, the ultimate PGP encryption toolkit for privacy and security.">
     <meta property="og:type" content="website">
@@ -21,113 +23,159 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/openpgp/4.0.1/openpgp.min.js" integrity="sha512-lExGOeNS95pcHQ7A8OyYt784z0PgWUM6aca060khfwM3oux+m1+DHIvcznUKsxr1lvow8EVjfLSUNVYtHsydSQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     
     <style>
+        :root {
+            --primary-color: #1a1a2e;
+            --secondary-color: #16213e;
+            --accent-color: #0f3460;
+            --background-color: #0e1228;
+            --text-color: #e9e9f0;
+            --card-bg: #252a41;
+            --hover-bg: rgba(45, 52, 89, 0.5);
+            --shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+            --border-radius: 15px;
+            --transition-speed: 0.4s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #fff;
-            color: #000;
-            padding: 20px;
-            margin: 0;
+            background: linear-gradient(135deg, var(--background-color), var(--secondary-color));
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: auto 1fr;
         }
 
         .sidebar {
-            background-color: #333;
-            color: #fff;
-            width: 200px;
-            padding: 20px;
-            position: fixed;
-            height: 100%;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            padding: 25px;
+            position: sticky;
             top: 0;
-            left: 0;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            height: 100vh;
+            overflow-y: auto;
+            width: 280px;
         }
 
         .sidebar h2 {
-            font-size: 1.5rem;
-            margin-bottom: 30px;
-            font-weight: 600;
+            margin-bottom: 25px;
+            font-size: 1.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .nav-link {
-            display: block;
-            padding: 10px 0;
+            color: var(--text-color);
             text-decoration: none;
-            color: #fff;
+            display: block;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: var(--border-radius);
+            transition: all var(--transition-speed);
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
             font-size: 1rem;
-            transition: background 0.3s ease;
+            cursor: pointer;
         }
 
-        .nav-link:hover {
-            background-color: #007bff;
+        .nav-link:hover, .nav-link.active {
+            background: var(--hover-bg);
+            transform: translateX(10px);
         }
 
         .container {
-            margin-left: 220px;
-            padding: 20px;
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .app-header {
             text-align: center;
+            padding: 40px;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            border-radius: var(--border-radius);
             margin-bottom: 30px;
-        }
-
-        .app-header h1 {
-            font-size: 2rem;
-        }
-
-        .app-header p {
-            font-size: 1rem;
-            color: #555;
+            box-shadow: var(--shadow);
         }
 
         .section {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 25px;
             margin-bottom: 30px;
-            padding: 20px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow);
             display: none;
         }
 
         .section.active {
             display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .input-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .input-group label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            font-weight: 500;
         }
 
         input, textarea {
             width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 1rem;
+            padding: 12px 15px;
+            border: 2px solid var(--accent-color);
+            border-radius: 10px;
+            background-color: rgba(45, 52, 89, 0.3);
+            color: var(--text-color);
+            transition: all var(--transition-speed);
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
         }
 
         input:focus, textarea:focus {
             outline: none;
-            border-color: #007bff;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 15px rgba(22, 33, 62, 0.5);
         }
 
         .btn {
-            background-color: #007bff;
-            color: #fff;
-            padding: 10px 20px;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            color: var(--text-color);
             border: none;
-            border-radius: 5px;
+            border-radius: var(--border-radius);
+            padding: 12px 25px;
             cursor: pointer;
+            transition: all var(--transition-speed);
             font-weight: 600;
-            transition: background 0.3s ease;
+            width: 100%;
         }
 
         .btn:hover {
-            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
         }
 
         .result-area {
@@ -139,37 +187,42 @@
         }
 
         .copy-btn {
-            background-color: #007bff;
-            color: #fff;
+            background: var(--accent-color);
             border: none;
-            padding: 8px 15px;
             border-radius: 5px;
+            padding: 8px 15px;
+            color: var(--text-color);
             cursor: pointer;
-            transition: background 0.3s ease;
+            margin-top: 5px;
+            transition: all 0.3s;
         }
 
         .copy-btn:hover {
-            background-color: #0056b3;
+            background: var(--secondary-color);
         }
 
         .alert {
             padding: 15px;
+            border-radius: var(--border-radius);
             margin-bottom: 20px;
-            border-radius: 5px;
             display: none;
         }
 
         .alert.success {
-            background-color: #d4edda;
-            color: #155724;
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid #28a745;
         }
 
         .alert.error {
-            background-color: #f8d7da;
-            color: #721c24;
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid #dc3545;
         }
 
         @media (max-width: 768px) {
+            body {
+                grid-template-columns: 1fr;
+            }
+
             .sidebar {
                 position: relative;
                 width: 100%;
@@ -177,7 +230,7 @@
             }
 
             .container {
-                margin-left: 0;
+                padding: 15px;
             }
         }
     </style>
@@ -270,16 +323,59 @@
 
         <section id="how-to" class="section">
             <h2>How To Use OnlinePGP</h2>
-            <p>Instructions for using the tool...</p>
+            <div class="content">
+                <h3>1. Generate Your Keys</h3>
+                <p>Start by generating your PGP key pair. You'll need:</p>
+                <ul>
+                    <li>Your full name</li>
+                    <li>Email address</li>
+                    <li>A strong passphrase (keep this safe!)</li>
+                </ul>
+                
+                <h3>2. Share Your Public Key</h3>
+                <p>Share your public key with others who want to send you encrypted messages. Keep your private key and passphrase secure!</p>
+                
+                <h3>3. Encrypt Messages</h3>
+                <p>To send an encrypted message:</p>
+                <ul>
+                    <li>Paste the recipient's public key</li>
+                    <li>Type your message</li>
+                    <li>Click encrypt</li>
+                    <li>Share the encrypted message with the recipient</li>
+                </ul>
+                
+                <h3>4. Decrypt Messages</h3>
+                <p>To read encrypted messages sent to you:</p>
+                <ul>
+                    <li>Paste your private key</li>
+                    <li>Enter your passphrase</li>
+                    <li>Paste the encrypted message</li>
+                    <li>Click decrypt to read the original message</li>
+                </ul>
+            </div>
         </section>
 
         <section id="about" class="section">
             <h2>About OnlinePGP</h2>
-            <p>About content...</p>
+            <div class="content">
+                <p>OnlinePGP is a modern, user-friendly toolkit for PGP encryption. We believe in making secure communication accessible to everyone while maintaining the highest standards of privacy and security.</p>
+                
+                <h3>Security Features</h3>
+                <ul>
+                    <li>Client-side encryption - your keys and messages never leave your browser</li>
+                    <li>Modern implementation using OpenPGP.js</li>
+                    <li>Strong encryption standards</li>
+                    <li>No data storage - everything is temporary and cleared on page refresh</li>
+                </ul>
+                
+                <h3>Privacy First</h3>
+                <p>All encryption and decryption happens locally in your browser. We never see your keys, messages, or any other sensitive data.</p>
+            </div>
         </section>
     </div>
 
     <script>
+        // Navigation
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', (e) => {
                 const sectionId = e.target.dataset.section;
@@ -288,6 +384,7 @@
         });
 
         function showSection(sectionId) {
+            // Update navigation
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.classList.remove('active');
                 if (link.dataset.section === sectionId) {
@@ -295,30 +392,35 @@
                 }
             });
 
+            // Show selected section
             document.querySelectorAll('.section').forEach(section => {
                 section.classList.remove('active');
             });
             document.getElementById(sectionId).classList.add('active');
         }
 
+        // Show initial section
         showSection('generate-keys');
 
+        // Alert system
         function showAlert(message, type = 'success') {
             const alertsContainer = document.getElementById('alerts');
             const alert = document.createElement('div');
             alert.className = `alert ${type}`;
             alert.textContent = message;
             alert.style.display = 'block';
+            
             alertsContainer.appendChild(alert);
-
+            
             setTimeout(() => {
                 alert.style.opacity = '0';
-                setTimeout(() => {
+            setTimeout(() => {
                     alertsContainer.removeChild(alert);
                 }, 300);
             }, 3000);
         }
 
+        // Clipboard functionality
         async function copyToClipboard(elementId) {
             const element = document.getElementById(elementId);
             try {
@@ -329,18 +431,102 @@
             }
         }
 
-        // PGP function examples
-        async function generateKeys() { 
-            // Your existing key generation logic here 
-        }
+        async function generateKeys() {
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const passphrase = document.getElementById('passphrase').value;
+
+    if (!name || !email || !passphrase) {
+        showAlert('Please fill in all fields', 'error');
+        return;
+    }
+
+    try {
+        showAlert('Generating keys...');
         
-        async function encryptMessage() { 
-            // Your existing encryption logic here
-        }
-        
-        async function decryptMessage() { 
-            // Your existing decryption logic here 
-        }
+        const { privateKeyArmored, publicKeyArmored } = await openpgp.generateKey({
+            userIds: [{ name, email }], // Changed from userIDs to userIds
+            rsaBits: 4096,
+            passphrase
+        });
+
+        document.getElementById('privateKey').value = privateKeyArmored;
+        document.getElementById('publicKey').value = publicKeyArmored;
+        showAlert('Keys generated successfully!');
+    } catch (error) {
+        console.error('Key generation error:', error);
+        showAlert('Failed to generate keys: ' + error.message, 'error');
+    }
+}
+
+async function encryptMessage() {
+    const publicKeyArmored = document.getElementById('publicKeyEncrypt').value.trim();
+    const plainText = document.getElementById('plainText').value.trim();
+
+    if (!publicKeyArmored || !plainText) {
+        showAlert('Please provide both public key and message', 'error');
+        return;
+    }
+
+    try {
+        const publicKey = await openpgp.key.readArmored(publicKeyArmored); // Changed from readKey
+        const message = openpgp.message.fromText(plainText); // Changed from createMessage
+        const encrypted = await openpgp.encrypt({
+            message,
+            publicKeys: publicKey.keys // Changed from encryptionKeys
+        });
+
+        document.getElementById('cipherText').value = encrypted;
+        showAlert('Message encrypted successfully!');
+    } catch (error) {
+        console.error('Encryption error:', error);
+        showAlert('Failed to encrypt message: ' + error.message, 'error');
+    }
+}
+
+async function decryptMessage() {
+    const privateKeyArmored = document.getElementById('privateKeyDecrypt').value.trim();
+    const passphrase = document.getElementById('passphraseDecrypt').value;
+    const encryptedMessage = document.getElementById('cipherTextDecrypt').value.trim();
+
+    if (!privateKeyArmored || !passphrase || !encryptedMessage) {
+        showAlert('Please provide private key, passphrase, and encrypted message', 'error');
+        return;
+    }
+
+    try {
+        const privateKey = (await openpgp.key.readArmored(privateKeyArmored)).keys[0]; // Changed from readPrivateKey
+        await privateKey.decrypt(passphrase); // Changed from decryptKey
+
+        const message = await openpgp.message.readArmored(encryptedMessage); // Changed from readMessage
+        const decrypted = await openpgp.decrypt({
+            message,
+            privateKeys: [privateKey] // Changed from decryptionKeys
+        });
+
+        document.getElementById('plainTextDecrypt').value = decrypted.data;
+        showAlert('Message decrypted successfully!');
+    } catch (error) {
+        console.error('Decryption error:', error);
+        showAlert('Failed to decrypt message: ' + error.message, 'error');
+    }
+}
+
+        // Clear sensitive data when leaving the page
+        window.addEventListener('beforeunload', () => {
+            const sensitiveFields = [
+                'privateKey', 'publicKey', 'privateKeyDecrypt',
+                'passphraseDecrypt', 'plainText', 'cipherText',
+                'cipherTextDecrypt', 'plainTextDecrypt'
+            ];
+            
+            sensitiveFields.forEach(fieldId => {
+                const element = document.getElementById(fieldId);
+                if (element) {
+                    element.value = '';
+                }
+            });
+        });
     </script>
 </body>
 </html>
