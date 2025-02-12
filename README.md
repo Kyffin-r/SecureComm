@@ -10,4 +10,4 @@ However, I welcome contributions that can help improve this tool, and I will do 
 
 For reference, this tool currently links to the OpenPGP 4.0.1 version.[4.0.1 OpenPGP](https://cdnjs.cloudflare.com/ajax/libs/openpgp/4.0.1/openpgp.min.js)
 
-https://github.com/Kyffin-r/UwuPGP/blob/main/favicon.png
+https://github.com/Kyffin-r/UwuPGP/favicon.png
