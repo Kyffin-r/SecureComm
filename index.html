@@ -488,16 +488,18 @@ async function decryptMessage() {
     }
 
     try {
-        const privateKey = (await openpgp.key.readArmored(privateKeyArmored)).keys[0]; // Changed from readPrivateKey
-        await privateKey.decrypt(passphrase); // Changed from decryptKey
-
-        const message = await openpgp.message.readArmored(encryptedMessage); // Changed from readMessage
-        const decrypted = await openpgp.decrypt({
-            message,
-            privateKeys: [privateKey] // Changed from decryptionKeys
+        const privateKey = await openpgp.decryptKey({
+            privateKey: await openpgp.readPrivateKey({ armoredKey: privateKeyArmored }),
+            passphrase,
         });
 
-        document.getElementById('plainTextDecrypt').value = decrypted.data;
+        const message = await openpgp.readMessage({ armoredMessage: encryptedMessage });
+        const { data: decrypted } = await openpgp.decrypt({
+            message,
+            decryptionKeys: privateKey,
+        });
+
+        document.getElementById('plainTextDecrypt').value = decrypted; // The decrypted plaintext
         showAlert('Message decrypted successfully!');
     } catch (error) {
         console.error('Decryption error:', error);
