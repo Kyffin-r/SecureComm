@@ -463,27 +463,18 @@ async function encryptMessage() {
     }
 
     try {
-        // Parse the public key
-        const publicKey = await openpgp.readKey({ armoredKey: publicKeyArmored });
-
-        // Create a message object from the plain text
-        const message = await openpgp.createMessage({ text: plainText });
-
-        // Encrypt the message
+        const publicKey = await openpgp.readKey({ armoredKey: publicKeyArmored }); // Updated to the correct method
         const encrypted = await openpgp.encrypt({
-            message,
-            encryptionKeys: publicKey
+            message: await openpgp.createMessage({ text: plainText }), // Use createMessage to handle the plaintext
+            encryptionKeys: publicKey, // Correct usage of encryptionKeys
         });
 
-        // Set the encrypted message in the output field
-        document.getElementById('cipherText').value = encrypted;
+        document.getElementById('cipherText').value = encrypted; // The result is a string
         showAlert('Message encrypted successfully!');
     } catch (error) {
         console.error('Encryption error:', error);
         showAlert('Failed to encrypt message: ' + error.message, 'error');
     }
-}
-
 }
 
 async function decryptMessage() {
